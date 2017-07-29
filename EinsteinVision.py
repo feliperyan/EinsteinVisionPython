@@ -3,13 +3,46 @@ API_GET_USAGE = API_ROOT + 'apiusage'
 API_GET_MODEL_INFO = API_ROOT + 'vision/models/'
 API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
+API_OAUTH = API_ROOT + 'oauth2/token'
 
 import requests
+import jwt
+import time
 
 class EinsteinVisionService:
-    
-    def __init__(self, token=''):
+
+    def __init__(self, token='', email=''):
         self.token = token
+        self.email = email
+
+
+    def get_token(self, pem_file):
+
+        pem = open(pem_file, 'r')
+        pem_data = pem.read()
+        pem.close()
+
+        payload = {
+            'aud': API_OAUTH,
+            'exp': time.time()+600, # 10 minutes
+            'sub': self.email
+        }
+
+        header = {'Content-type':'application/x-www-form-urlencoded'}
+
+        assertion = jwt.encode(payload, pem_data, algorithm='RS256')
+        assertion = assertion.decode('utf-8')
+
+        response = requests.post(
+            url=API_OAUTH,
+            headers=header,
+            data='grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion='+assertion
+        )
+
+        print(response.text)
+
+        if response.status_code == 200:
+            self.token = response.json()['access_token']
 
 
     def check_for_token(self, token):
