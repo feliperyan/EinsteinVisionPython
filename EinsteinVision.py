@@ -1,3 +1,8 @@
+import requests
+import jwt
+import time
+
+
 API_ROOT = 'https://api.einstein.ai/v2/'
 API_GET_USAGE = API_ROOT + 'apiusage'
 API_GET_MODEL_INFO = API_ROOT + 'vision/models/'
@@ -5,22 +10,21 @@ API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
 API_OAUTH = API_ROOT + 'oauth2/token'
 
-import requests
-import jwt
-import time
 
 class EinsteinVisionService:
 
-    def __init__(self, token='', email=''):
+    def __init__(self, token=None, email=None, pem_file='predictive_services.pem'):
         self.token = token
         self.email = email
 
+        if token is None:
+            pem = open(pem_file, 'r')
+            pem_data = pem.read()
+            pem.close()
+            self.private_key = pem_data
 
-    def get_token(self, pem_file):
 
-        pem = open(pem_file, 'r')
-        pem_data = pem.read()
-        pem.close()
+    def get_token(self):
 
         payload = {
             'aud': API_OAUTH,
@@ -30,7 +34,7 @@ class EinsteinVisionService:
 
         header = {'Content-type':'application/x-www-form-urlencoded'}
 
-        assertion = jwt.encode(payload, pem_data, algorithm='RS256')
+        assertion = jwt.encode(payload, self.private_key, algorithm='RS256')
         assertion = assertion.decode('utf-8')
 
         response = requests.post(
@@ -67,7 +71,7 @@ class EinsteinVisionService:
         the_url = url
         r = requests.get(the_url, headers=h)
 
-        return r.json()
+        return r
 
 
     def get_image_prediction(self, model_id, picture_url, token=None, url=API_GET_DATASETS_INFO):
