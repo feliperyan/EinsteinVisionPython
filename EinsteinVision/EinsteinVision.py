@@ -20,9 +20,9 @@ class EinsteinVisionService:
         self.email = email
 
         if token is None:
-            pem = open(pem_file, 'r')
-            pem_data = pem.read()
-            pem.close()
+            with open(pem_file, 'r') as pem:            
+                pem_data = pem.read()
+            
             self.private_key = pem_data
 
 
@@ -48,7 +48,10 @@ class EinsteinVisionService:
         print(response.text)
 
         if response.status_code == 200:
+            print('status 200 ok for Token')
             self.token = response.json()['access_token']
+        else:
+            print('Could not get Token. Status: ' + str(response.status_code))
 
 
     def check_for_token(self, token):
