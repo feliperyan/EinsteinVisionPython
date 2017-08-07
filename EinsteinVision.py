@@ -9,6 +9,7 @@ API_GET_MODEL_INFO = API_ROOT + 'vision/models/'
 API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
 API_OAUTH = API_ROOT + 'oauth2/token'
+API_GET_MODELS = API_ROOT + 'vision/datasets/<dataset_id>/models'
 
 
 class EinsteinVisionService:
@@ -73,12 +74,30 @@ class EinsteinVisionService:
 
         return r
 
+    def get_all_models_for_dataset(self, dataset_id, token=None, url=API_GET_MODELS):
+        auth = 'Bearer ' + self.check_for_token(token)
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url.replace('<dataset_id>', dataset_id)
+        r = requests.get(the_url, headers=h)
 
-    def get_image_prediction(self, model_id, picture_url, token=None, url=API_GET_DATASETS_INFO):
+        return r
+#
+#
+    def get_image_prediction_url(self, model_id, picture_url, token=None, url=API_GET_PREDICTION_IMAGE_URL):
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type': 'multipart/form-data'}
         the_url = url
-        r = requests.post(the_url, headers=h, data={'sampleLocation':picture_url, 'modelId': model_id})
 
-        return r.json()
+        the_data = {
+            'sampleLocation':picture_url, 
+            'modelId': model_id
+        }
+        
+        the_data = 'sampleLocation'
 
+        r = requests.post(the_url, headers=h, data=the_data)
+        
+
+        return r
+
+    
