@@ -1,4 +1,5 @@
 import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 import jwt
 import time
 
@@ -73,31 +74,14 @@ class EinsteinVisionService:
         r = requests.get(the_url, headers=h)
 
         return r
-
-    def get_all_models_for_dataset(self, dataset_id, token=None, url=API_GET_MODELS):
-        auth = 'Bearer ' + self.check_for_token(token)
-        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
-        the_url = url.replace('<dataset_id>', dataset_id)
-        r = requests.get(the_url, headers=h)
-
-        return r
 #
 #
-    def get_image_prediction_url(self, model_id, picture_url, token=None, url=API_GET_PREDICTION_IMAGE_URL):
+
+    def get_url_image_prediction(self, model_id, picture_url, token=None, url=API_GET_PREDICTION_IMAGE_URL):
         auth = 'Bearer ' + self.check_for_token(token)
-        h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type': 'multipart/form-data'}
+        m = MultipartEncoder(fields={'sampleLocation':picture_url, 'modelId':model_id})
+        h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
         the_url = url
-
-        the_data = {
-            'sampleLocation':picture_url, 
-            'modelId': model_id
-        }
-        
-        the_data = 'sampleLocation'
-
-        r = requests.post(the_url, headers=h, data=the_data)
-        
+        r = requests.post(the_url, headers=h, data=m)
 
         return r
-
-    
