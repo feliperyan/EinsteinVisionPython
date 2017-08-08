@@ -2,6 +2,7 @@ import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import jwt
 import time
+import base64
 
 
 API_ROOT = 'https://api.einstein.ai/v2/'
@@ -75,12 +76,26 @@ class EinsteinVisionService:
         return r
 #
 #
-
     def get_url_image_prediction(self, model_id, picture_url, token=None, url=API_GET_PREDICTION_IMAGE_URL):
         auth = 'Bearer ' + self.check_for_token(token)
         m = MultipartEncoder(fields={'sampleLocation':picture_url, 'modelId':model_id})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
         the_url = url
+        r = requests.post(the_url, headers=h, data=m)
+
+        return r
+#
+#
+    def get_fileb64_image_prediction(self, model_id, filename, token=None, url=API_GET_PREDICTION_IMAGE_URL):
+        auth = 'Bearer ' + self.check_for_token(token)        
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url
+
+        with open(filename, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+
+        m = MultipartEncoder(fields={'sampleBase64Content':encoded_string, 'modelId':model_id})
+        h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
         r = requests.post(the_url, headers=h, data=m)
 
         return r
