@@ -88,6 +88,26 @@ class TestStringMethods(unittest.TestCase):
 
         self.assertTrue(self.genius.get_model_info(model_id='dummy id').json() is not None)
         self.assertTrue('metricsData' in self.genius.get_model_info(model_id='dummy id').json().keys())
+
+    def test_check_for_token(self):
+        self.assertTrue(self.genius.check_for_token('ok') == 'ok')
+        self.genius.token = 'dummy token'
+        self.assertTrue(self.genius.check_for_token() == 'dummy token')
+
+
+    @patch('EinsteinVision.EinsteinVision.requests.post')
+    def test_get_url_image_prediction(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json = lambda : {'probabilities':'aloha', 'object':'predictresponse'}
+
+        self.genius.token = 'dummy token'
+
+        response = self.genius.get_url_image_prediction(model_id='dummy', picture_url='www.dummy.com/img.jpg')
+
+        self.assertTrue(response.json() is not None)
+        self.assertTrue('probabilities' in response.json().keys())
+        self.assertTrue('object' in response.json().keys())
+
 #
 #
 if __name__ == '__main__':

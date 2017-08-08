@@ -55,7 +55,7 @@ class EinsteinVisionService:
             print('Could not get Token. Status: ' + str(response.status_code))
 
 
-    def check_for_token(self, token):
+    def check_for_token(self, token=None):
         if token:
             return token
         else:
