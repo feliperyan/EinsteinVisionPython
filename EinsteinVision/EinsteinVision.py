@@ -21,9 +21,9 @@ class EinsteinVisionService:
         self.email = email
 
         if token is None:
-            with open(pem_file, 'r') as pem:            
+            with open(pem_file, 'r') as pem:
                 pem_data = pem.read()
-            
+
             self.private_key = pem_data
 
 
