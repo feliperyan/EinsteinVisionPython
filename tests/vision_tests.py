@@ -2,8 +2,6 @@ import sys, os
 myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
-print(sys.path)
-
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
 from unittest import mock
