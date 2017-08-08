@@ -68,7 +68,7 @@ class EinsteinVisionService:
         the_url = url + model_id
         r = requests.get(the_url, headers=h)
 
-        return r.json()
+        return r
 
 
     def get_datasets_info(self, token=None, url=API_GET_DATASETS_INFO):

@@ -54,7 +54,7 @@ class TestStringMethods(unittest.TestCase):
 #
 #
     @patch('EinsteinVision.EinsteinVision.requests.post')
-    def test_get_token(self, mock_post):        
+    def test_get_token(self, mock_post):
 
         mock_post.return_value.status_code = 200
         mock_post.return_value.json = lambda : {'access_token':'aloha'}
@@ -63,6 +63,31 @@ class TestStringMethods(unittest.TestCase):
         self.genius.get_token()
         print('this is the token: ' + str(self.genius.token))
         self.assertTrue(self.genius.token is not None)
+#
+#
+    @patch('EinsteinVision.EinsteinVision.requests.get')
+    def test_get_datasets_info(self, mock_get):
+
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json = lambda : {'object':'list', 'data':[]}
+
+        self.genius.token = 'dummy token'
+
+        self.assertTrue(self.genius.get_datasets_info().json() is not None)
+        self.assertTrue('data' in self.genius.get_datasets_info().json().keys())
+        self.assertTrue('object' in self.genius.get_datasets_info().json().keys())
+#
+#
+    @patch('EinsteinVision.EinsteinVision.requests.get')
+    def test_get_model_info(self, mock_get):
+
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json = lambda : {'metricsData':'list'}
+
+        self.genius.token = 'dummy token'
+
+        self.assertTrue(self.genius.get_model_info(model_id='dummy id').json() is not None)
+        self.assertTrue('metricsData' in self.genius.get_model_info(model_id='dummy id').json().keys())
 #
 #
 if __name__ == '__main__':
