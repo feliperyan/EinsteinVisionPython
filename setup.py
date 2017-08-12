@@ -6,8 +6,8 @@ setup(
   description = 'Wrapper for Salesforce\'s Einstein Predictive Vision API',
   author = 'Felipe Ryan',
   author_email = 'feliperyan@gmail.com',
-  url = 'https://github.com/feliperyan/EinsteinPredictiveVision', # use the URL to the github repo
-  download_url = 'https://github.com/feliperyan/EinsteinPredictiveVision/archive/0.1.tar.gz', # I'll explain this in a second
+  url = 'https://github.com/feliperyan/EinsteinVisionPython', # use the URL to the github repo
+  download_url = 'https://github.com/feliperyan/EinsteinVisionPython/archive/0.1.tar.gz', # I'll explain this in a second
   keywords = ['api', 'einsteinpredictivevision', 'metamind', 'salesforce'], # arbitrary keywords
   classifiers = [],
 )
