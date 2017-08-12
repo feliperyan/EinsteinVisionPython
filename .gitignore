@@ -1,3 +1,5 @@
 *.pem
 p_env
 __pycache__
+htmlcov
+.vscode
