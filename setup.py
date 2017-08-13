@@ -10,4 +10,10 @@ setup(
   download_url = 'https://github.com/feliperyan/EinsteinVisionPython/archive/0.2.tar.gz', # I'll explain this in a second
   keywords = ['api', 'einsteinpredictivevision', 'metamind', 'salesforce'], # arbitrary keywords
   classifiers = [],
+  install_requires=[
+          'requests',
+          'requests_toolbelt',
+          'cryptography',
+          'PyJWT'
+      ],
 )
