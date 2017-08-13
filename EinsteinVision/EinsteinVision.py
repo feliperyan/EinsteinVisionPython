@@ -78,8 +78,8 @@ class EinsteinVisionService:
         r = requests.get(the_url, headers=h)
 
         return r
-#
-#
+
+
     def get_url_image_prediction(self, model_id, picture_url, token=None, url=API_GET_PREDICTION_IMAGE_URL):
         auth = 'Bearer ' + self.check_for_token(token)
         m = MultipartEncoder(fields={'sampleLocation':picture_url, 'modelId':model_id})
@@ -88,8 +88,8 @@ class EinsteinVisionService:
         r = requests.post(the_url, headers=h, data=m)
 
         return r
-#
-#
+
+
     def get_fileb64_image_prediction(self, model_id, filename, token=None, url=API_GET_PREDICTION_IMAGE_URL):
         auth = 'Bearer ' + self.check_for_token(token)        
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
