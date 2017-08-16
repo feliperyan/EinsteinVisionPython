@@ -12,6 +12,8 @@ API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
 API_OAUTH = API_ROOT + 'oauth2/token'
 API_GET_MODELS = API_ROOT + 'vision/datasets/<dataset_id>/models'
+API_CREATE_DATASET = API_ROOT + 'datasets/upload/sync'
+API_TRAIN_MODEL = API_ROOT + 'vision/train'
 
 
 class EinsteinVisionService:
@@ -101,5 +103,34 @@ class EinsteinVisionService:
         m = MultipartEncoder(fields={'sampleBase64Content':encoded_string, 'modelId':model_id})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
         r = requests.post(the_url, headers=h, data=m)
+
+        return r
+
+
+    def create_dataset_synchronous(self, file_url, token=None, url=API_CREATE_DATASET):
+        auth = 'Bearer ' + self.check_for_token(token)
+        m = MultipartEncoder(fields={'type':'image', 'path':file_url})
+        h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
+        the_url = url
+        r = requests.post(the_url, headers=h, data=m)
+
+        return r
+
+
+    def train_model(self, dataset_id, model_name, token=None, url=API_TRAIN_MODEL):
+        auth = 'Bearer ' + self.check_for_token(token)
+        m = MultipartEncoder(fields={'name':model_name, 'datasetId':dataset_id})
+        h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
+        the_url = url
+        r = requests.post(the_url, headers=h, data=m)
+
+        return r
+
+
+    def get_training_status(self, model_id, token=None, url=API_TRAIN_MODEL):
+        auth = 'Bearer ' + self.check_for_token(token)
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url + model_id
+        r = requests.get(the_url, headers=h)
 
         return r
