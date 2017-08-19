@@ -36,8 +36,12 @@ class EinsteinVisionService:
     def get_token(self):
         """ Acquires a token for futher API calls, unless you already have a token this will be the first thing
             you do before you use this.
+            :param email: string, the username for your EinsteinVision service, usually in email form
+            :para pem_file: string, file containing your Secret key. Copy contents of relevant Config Var
+            on Heroku to a file locally.
             attention: this will set self.token on success
-            attention: currently spitting out results via a simple print 
+            attention: currently spitting out results via a simple print
+            returns: requests object
         """
         payload = {
             'aud': API_OAUTH,
@@ -67,10 +71,7 @@ class EinsteinVisionService:
         return response
 
 
-    def check_for_token(self, token=None):
-        """ A helper function to go get self.token in case no token was specified
-            will return self.token in most cases unless you getting a token somewhere else.
-        """
+    def check_for_token(self, token=None):       
         if token:
             return token
         else:
@@ -78,6 +79,10 @@ class EinsteinVisionService:
 
 
     def get_model_info(self, model_id, token=None, url=API_GET_MODEL_INFO):
+        """ Gets information about a specific previously trained model, ie: stats and accuracy
+            :param model_id: string, model_id previously supplied by the API
+            returns: requests object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
         the_url = url + model_id
@@ -87,6 +92,9 @@ class EinsteinVisionService:
 
 
     def get_datasets_info(self, token=None, url=API_GET_DATASETS_INFO):
+        """ Gets information on all datasets for this account
+            returns: requests object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
         the_url = url
@@ -96,6 +104,12 @@ class EinsteinVisionService:
 
 
     def get_url_image_prediction(self, model_id, picture_url, token=None, url=API_GET_PREDICTION_IMAGE_URL):
+        """ Gets a prediction from a supplied picture url based on a previously trained model.
+            :param model_id: string, once you train a model you'll be given a model id to use.
+            :param picture_url: string, in the form of a url pointing to a publicly accessible
+            image file.
+            returns: requests object 
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         m = MultipartEncoder(fields={'sampleLocation':picture_url, 'modelId':model_id})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
@@ -106,6 +120,12 @@ class EinsteinVisionService:
 
 
     def get_fileb64_image_prediction(self, model_id, filename, token=None, url=API_GET_PREDICTION_IMAGE_URL):
+        """ Gets a prediction from a supplied image on your machine, by encoding the image data as b64
+            and posting to the API.
+            :param model_id: string, once you train a model you'll be given a model id to use.
+            :param filename: string, the name of a file to be posted to the api.
+            returns: requests object
+        """
         auth = 'Bearer ' + self.check_for_token(token)        
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
         the_url = url
@@ -121,6 +141,11 @@ class EinsteinVisionService:
 
 
     def create_dataset_synchronous(self, file_url, token=None, url=API_CREATE_DATASET):
+        """ Creates a dataset so you can train models from it
+            :param file_url: string, url to an accessible zip file containing the necessary image files
+            and folder structure indicating the labels to train. See docs online.
+            returns: requests object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         m = MultipartEncoder(fields={'type':'image', 'path':file_url})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
@@ -131,6 +156,13 @@ class EinsteinVisionService:
 
 
     def train_model(self, dataset_id, model_name, token=None, url=API_TRAIN_MODEL):
+        """ Train a model given a specifi dataset previously created
+            :param dataset_id: string, the id of a previously created dataset
+            :para model_name: string, what you will call this model
+            attention: This may take a while and a response will be returned before the model has
+            finished being trained. See docos and method get_training_status.
+            returns: requests object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         m = MultipartEncoder(fields={'name':model_name, 'datasetId':dataset_id})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
@@ -141,6 +173,10 @@ class EinsteinVisionService:
 
 
     def get_training_status(self, model_id, token=None, url=API_TRAIN_MODEL):
+        """ Gets status on the training process once you create a model
+            :param model_id: string, id of the model to check
+            returns: requests object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
         the_url = url + model_id
