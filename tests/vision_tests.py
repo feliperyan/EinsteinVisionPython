@@ -108,6 +108,34 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue('probabilities' in response.json().keys())
         self.assertTrue('object' in response.json().keys())
 
+    
+    @patch('EinsteinVision.EinsteinVision.requests.post')
+    def test_get_fileb64_image_prediction(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json = lambda : {'probabilities':'aloha', 'object':'predictresponse'}
+        self.genius.token = 'dummy token'
+
+        with patch('EinsteinVision.EinsteinVision.open', mock_open(read_data=b'some binary picture file data')) as m:
+            response = self.genius.get_fileb64_image_prediction(model_id='dummy', filename='dummyfile.jpg')            
+
+        self.assertTrue(response.json() is not None)
+        self.assertTrue('probabilities' in response.json().keys())
+        self.assertTrue('object' in response.json().keys())
+
+    
+    @patch('EinsteinVision.EinsteinVision.requests.post')
+    def test_create_dataset_synchronous(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json = lambda : {'probabilities':'aloha', 'object':'predictresponse'}
+        self.genius.token = 'dummy token'
+
+        response = self.genius.create_dataset_synchronous(file_url='dummy url')
+
+        self.assertTrue(response.json() is not None)
+
+
+    
+
 #
 #
 if __name__ == '__main__':

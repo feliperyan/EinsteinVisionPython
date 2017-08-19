@@ -17,7 +17,11 @@ API_TRAIN_MODEL = API_ROOT + 'vision/train'
 
 
 class EinsteinVisionService:
-
+    """ A wrapper for Salesforce's Einstein Vision API.
+        :param token: string, in case you obtained a token somewhere else and want to use it here.
+        :param email: string, the username for your Enstein Vision account, not needed if you already have a token
+        :param pem_file: string, name of a file containing your secret key, defaults to predictive_services.pem    
+    """
     def __init__(self, token=None, email=None, pem_file='predictive_services.pem'):
         self.token = token
         self.email = email
@@ -30,7 +34,11 @@ class EinsteinVisionService:
 
 
     def get_token(self):
-
+        """ Acquires a token for futher API calls, unless you already have a token this will be the first thing
+            you do before you use this.
+            attention: this will set self.token on success
+            attention: currently spitting out results via a simple print 
+        """
         payload = {
             'aud': API_OAUTH,
             'exp': time.time()+600, # 10 minutes
@@ -56,8 +64,13 @@ class EinsteinVisionService:
         else:
             print('Could not get Token. Status: ' + str(response.status_code))
 
+        return response
+
 
     def check_for_token(self, token=None):
+        """ A helper function to go get self.token in case no token was specified
+            will return self.token in most cases unless you getting a token somewhere else.
+        """
         if token:
             return token
         else:
