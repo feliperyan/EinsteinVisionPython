@@ -1,0 +1,15 @@
+asn1crypto==0.22.0
+certifi==2017.7.27.1
+cffi==1.10.0
+chardet==3.0.4
+codecov==2.0.9
+coverage==4.4.1
+cryptography==2.0.3
+EinsteinVision==0.5
+idna==2.6
+pycparser==2.18
+PyJWT==1.5.2
+requests==2.18.4
+requests-toolbelt==0.8.0
+six==1.10.0
+urllib3==1.22
