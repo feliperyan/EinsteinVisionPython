@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/feliperyan/EinsteinVisionPython/branch/master/graph/badge.svg)](https://codecov.io/gh/feliperyan/EinsteinVisionPython)
+[![travis-ci](https://travis-ci.org/feliperyan/EinsteinVisionPython.svg?branch=master)](https://travis-ci.org/feliperyan/EinsteinVisionPython)
 # EinsteinVisionPython
 
 ### Very much a work in progress Python Wrapper for the [Einstein Predictive Vision API service](https://devcenter.heroku.com/articles/einstein-vision)

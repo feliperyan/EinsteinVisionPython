@@ -43,16 +43,16 @@ class TestStringMethods(unittest.TestCase):
     def setUp(self):
         with patch('EinsteinVision.EinsteinVision.open', mock_open(read_data=FAKE_PEM)) as m:
             self.genius = EinsteinVisionService(email='f@f.com', pem_file='aloha.pem')
-#    
-#
+   
+
     def test_init_and_pem_file(self):
         with patch('EinsteinVision.EinsteinVision.open', mock_open(read_data='some pem file data')) as m:
             genius = EinsteinVisionService(email='f@f.com', pem_file='aloha.pem')            
         
         self.assertTrue(genius is not None)
         self.assertTrue(genius.private_key == 'some pem file data')
-#
-#
+
+
     @patch('EinsteinVision.EinsteinVision.requests.post')
     def test_get_token(self, mock_post):
 
@@ -63,8 +63,8 @@ class TestStringMethods(unittest.TestCase):
         self.genius.get_token()
         print('this is the token: ' + str(self.genius.token))
         self.assertTrue(self.genius.token is not None)
-#
-#
+
+
     @patch('EinsteinVision.EinsteinVision.requests.get')
     def test_get_datasets_info(self, mock_get):
 
@@ -76,8 +76,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(self.genius.get_datasets_info().json() is not None)
         self.assertTrue('data' in self.genius.get_datasets_info().json().keys())
         self.assertTrue('object' in self.genius.get_datasets_info().json().keys())
-#
-#
+
+
     @patch('EinsteinVision.EinsteinVision.requests.get')
     def test_get_model_info(self, mock_get):
 
@@ -134,9 +134,6 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(response.json() is not None)
 
 
-    
 
-#
-#
 if __name__ == '__main__':
     unittest.main()

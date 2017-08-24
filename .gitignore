@@ -5,3 +5,4 @@ htmlcov
 .vscode
 *.pyc
 dist
+minimal_env
