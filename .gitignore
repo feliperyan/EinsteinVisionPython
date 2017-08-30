@@ -6,3 +6,5 @@ htmlcov
 *.pyc
 dist
 minimal_env
+images
+minimal
