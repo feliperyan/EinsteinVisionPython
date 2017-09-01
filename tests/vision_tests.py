@@ -134,6 +134,41 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(response.json() is not None)
 
 
+    @patch('EinsteinVision.EinsteinVision.requests.post')
+    def test_train_model(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json = lambda : {'datasetId':'51', 'status':'queued'}
+        self.genius.token = 'dummy token'
+
+        response = self.genius.train_model(dataset_id='123', model_name='model')
+
+        self.assertTrue(response.json() is not None)
+
+
+    @patch('EinsteinVision.EinsteinVision.requests.get')
+    def test_get_training_status(self, mock_get):
+
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json = lambda : {'object':'list', 'data':[]}
+
+        self.genius.token = 'dummy token'
+        response = self.genius.get_training_status(model_id='1234').json()
+        
+        self.assertTrue(response is not None)        
+
+
+    @patch('EinsteinVision.EinsteinVision.requests.get')
+    def test_get_models_info_for_dataset(self, mock_get):
+
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json = lambda : {'object':'list', 'data':[]}
+
+        self.genius.token = 'dummy token'
+        response = self.genius.get_models_info_for_dataset(dataset_id='1234').json()
+        
+        self.assertTrue(response is not None)
+
+
 
 if __name__ == '__main__':
     unittest.main()
