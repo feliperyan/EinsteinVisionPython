@@ -3,6 +3,8 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 import jwt
 import time
 import base64
+import os
+import json
 
 
 API_ROOT = 'https://api.einstein.ai/v2/'
@@ -12,7 +14,8 @@ API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
 API_OAUTH = API_ROOT + 'oauth2/token'
 API_GET_MODELS = API_ROOT + 'vision/datasets/<dataset_id>/models'
-API_CREATE_DATASET = API_ROOT + 'datasets/upload/sync'
+API_CREATE_DATASET = API_ROOT + 'vision/datasets/upload/sync'
+API_CREATE_DATASET_ASYNC = API_ROOT + 'vision/datasets/upload' #not yet used
 API_TRAIN_MODEL = API_ROOT + 'vision/train'
 
 
@@ -140,14 +143,16 @@ class EinsteinVisionService:
         return r
 
 
-    def create_dataset_synchronous(self, file_url, token=None, url=API_CREATE_DATASET):
+    def create_dataset_synchronous(self, file_url, dataset_type='image', token=None, url=API_CREATE_DATASET):
         """ Creates a dataset so you can train models from it
             :param file_url: string, url to an accessible zip file containing the necessary image files
             and folder structure indicating the labels to train. See docs online.
+            :param dataset_type: string, one of the dataset types, available options Nov 2017 were 
+            'image', 'image-detection' and 'image-multi-label'.
             returns: requests object
         """
         auth = 'Bearer ' + self.check_for_token(token)
-        m = MultipartEncoder(fields={'type':'image', 'path':file_url})
+        m = MultipartEncoder(fields={'type':dataset_type, 'path':file_url})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
         the_url = url
         r = requests.post(the_url, headers=h, data=m)
@@ -204,3 +209,68 @@ class EinsteinVisionService:
 
         return r
 
+    
+    #TODO: Something I did when outputting the file failed and I just repeated the same row over and over again.
+    def parse_rectlabel_app_output(self):
+        # get json files only
+        files = []
+        files = [f for f in os.listdir() if f[-5:] == '.json']
+
+        if len(files) == 0:
+            print('No json files found in this directory')
+            return None
+
+        max_boxes = 0        
+        rows = []
+
+        for each_file in files:
+            f = open(each_file, 'r')
+            j = f.read()            
+            j = json.loads(j)            
+            f.close()
+
+            # running count of the # of boxes.
+            if len(j['objects']) > max_boxes:
+                max_boxes = len(j['objects'])
+
+            # Each json file will end up being a row
+            # set labels
+            row = []
+
+            for o in j['objects']:
+                labels = {}
+                labels['label'] = o['label']
+                labels['x'] = o['x_y_w_h'][0]
+                labels['y'] = o['x_y_w_h'][1]
+                labels['width'] = o['x_y_w_h'][2]
+                labels['height'] = o['x_y_w_h'][3]
+
+                # String manipulation for csv
+                labels_right_format = '\"' + json.dumps(labels).replace('"', '\"\"') + '\"'
+
+                row.append(labels_right_format)
+
+            row.insert(0, '\"' + j['filename'] + '\"')        
+
+            rows.append(row)
+
+        # on array element per row
+        rows = [','.join(i) for i in rows]
+
+        header = '\"image\"'
+        
+        for box_num in range(0, max_boxes):
+            header += ', \"box\"' + str(box_num)
+
+        rows.insert(0, header)
+        return rows
+
+    def save_parsed_data_to_csv(self, output_filename='output.csv'):
+        result = self.parse_rectlabel_app_output()
+
+        ff = open(output_filename, 'w', encoding='utf8')
+
+        for line in result:
+            ff.write(line + '\n')
+
+        ff.close()
