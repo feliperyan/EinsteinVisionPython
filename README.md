@@ -24,7 +24,7 @@ r = genius.get_datasets_info()
 r.json()
 ```
 
-2017-08-16 At the moment you can use this to:
+2017-01-11 At the moment you can use this to:
 1. Read a .pem file (remember you can copy-paste your primary key into a file and name it .pem)
 2. Generate an Auth Token
 3. Send an image URL and a modelId (GeneralImageClassifier if you want) and get a prediction
@@ -32,3 +32,5 @@ r.json()
 5. Create a dataset from an accessible zip url
 6. Train a model given a dataset id
 7. Check on status of training
+8. Parse the output of [RectLabel](https://rectlabel.com/) (a json file per  picture) into a csv file to train Object Detection
+
