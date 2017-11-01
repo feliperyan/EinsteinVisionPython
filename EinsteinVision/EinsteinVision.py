@@ -163,7 +163,7 @@ class EinsteinVisionService:
     def train_model(self, dataset_id, model_name, token=None, url=API_TRAIN_MODEL):
         """ Train a model given a specifi dataset previously created
             :param dataset_id: string, the id of a previously created dataset
-            :para model_name: string, what you will call this model
+            :param model_name: string, what you will call this model
             attention: This may take a while and a response will be returned before the model has
             finished being trained. See docos and method get_training_status.
             returns: requests object
@@ -210,8 +210,13 @@ class EinsteinVisionService:
         return r
 
     
-    #TODO: Something I did when outputting the file failed and I just repeated the same row over and over again.
     def parse_rectlabel_app_output(self):
+        """ Internal use mostly, finds all .json files in the current folder expecting them to all have been outputted by the RectLabel app
+            parses each file returning finally an array representing a csv file where each element is a row and the 1st element [0] is the
+            column headers.
+            Could be useful for subsequent string manipulation therefore not prefixed with an underscore
+            RectLabel info: https://rectlabel.com/
+        """
         # get json files only
         files = []
         files = [f for f in os.listdir() if f[-5:] == '.json']
@@ -266,6 +271,10 @@ class EinsteinVisionService:
         return rows
 
     def save_parsed_data_to_csv(self, output_filename='output.csv'):
+        """ Outputs a csv file in accordance with parse_rectlabel_app_output method. This csv file is meant to accompany a set of pictures files
+            in the creation of an Object Detection dataset.
+            :param output_filename string, default makes sense, but for your convenience.
+        """
         result = self.parse_rectlabel_app_output()
 
         ff = open(output_filename, 'w', encoding='utf8')
