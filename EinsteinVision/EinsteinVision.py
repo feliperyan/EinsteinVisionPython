@@ -22,6 +22,7 @@ API_TRAIN_MODEL = API_ROOT + 'vision/train'
 API_CREATE_LANGUAGE_DATASET = API_ROOT + 'language/datasets/upload'
 API_GET_LANGUAGE_DATASET_INFO = API_ROOT + 'language/datasets/'
 API_TRAIN_LANGUAGE_MODEL = API_ROOT + 'language/train'
+API_GET_LANGUAGE_PREDICTION = API_ROOT + 'language/intent'
 
 class EinsteinVisionService:
     """ A wrapper for Salesforce's Einstein Vision API.
@@ -213,9 +214,16 @@ class EinsteinVisionService:
 
         return r
 
-<<<<<<< HEAD
 
     def create_language_dataset_from_url(self, file_url, token=None, url=API_CREATE_LANGUAGE_DATASET):
+        """ Creates a dataset from a publicly accessible file stored in the cloud.
+            :param file_url: string, in the form of a URL to a file accessible on the cloud. 
+            Popular options include Dropbox, AWS S3, Google Drive.
+            warning: Google Drive by default gives you a link to a web ui that allows you to download a file
+            NOT to the file directly. There is a way to change the link to point directly to the file as of 2018
+            as this may change, please search google for a solution.
+            returns: a request object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         dummy_files = {'type': (None, 'text-intent'), 'path':(None, file_url)}
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
@@ -229,6 +237,11 @@ class EinsteinVisionService:
 
     
     def train_language_model_from_dataset(self, dataset_id, name, token=None, url=API_TRAIN_LANGUAGE_MODEL):
+        """ Trains a model given a dataset and its ID.
+            :param dataset_id: string, the ID for a dataset you created previously.
+            :param name: string, name for your model.            
+            returns: a request object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         dummy_files = {'name': (None, name), 'datasetId':(None, dataset_id)}
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
@@ -238,7 +251,11 @@ class EinsteinVisionService:
         return r
 
 
-    def get_language_model_status(self, dataset_id, model_id, token=None, url=API_TRAIN_LANGUAGE_MODEL):
+    def get_language_model_status(self, model_id, token=None, url=API_TRAIN_LANGUAGE_MODEL):
+        """ Gets the status of your model, including whether the training has finished.
+            :param model_id: string, the ID for a model you created previously.            
+            returns: a request object
+        """
         auth = 'Bearer ' + self.check_for_token(token)        
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
         the_url = url + model_id
@@ -247,7 +264,12 @@ class EinsteinVisionService:
         return r
 
     
-    def get_language_prediction_from_model(self, model_id, document, token=None, url=):
+    def get_language_prediction_from_model(self, model_id, document, token=None, url=API_GET_LANGUAGE_PREDICTION):
+        """ Gets a prediction based on a body of text you send to a trained model you created previously.
+            :param model_id: string, the ID for a model you created previously.
+            :param document: string, a body of text to be classified.
+            returns: a request object
+        """
         auth = 'Bearer ' + self.check_for_token(token)
         dummy_files = {'modelId': (None, model_id), 'document':(None, document)}
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
@@ -255,8 +277,8 @@ class EinsteinVisionService:
         r = requests.post(the_url, headers=h, files=dummy_files)
 
         return r
-=======
     
+
     def parse_rectlabel_app_output(self):
         """ Internal use mostly, finds all .json files in the current folder expecting them to all have been outputted by the RectLabel app
             parses each file returning finally an array representing a csv file where each element is a row and the 1st element [0] is the
@@ -330,4 +352,3 @@ class EinsteinVisionService:
             ff.write(line + '\n')
 
         ff.close()
->>>>>>> a2ca2b04c2a65694fecbb908977d0010d94d1d2a
