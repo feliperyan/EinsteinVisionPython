@@ -3,6 +3,8 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 import jwt
 import time
 import base64
+import os
+import json
 
 
 API_ROOT = 'https://api.einstein.ai/v2/'
@@ -12,7 +14,8 @@ API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
 API_OAUTH = API_ROOT + 'oauth2/token'
 API_GET_MODELS = API_ROOT + 'vision/datasets/<dataset_id>/models'
-API_CREATE_DATASET = API_ROOT + 'datasets/upload/sync'
+API_CREATE_DATASET = API_ROOT + 'vision/datasets/upload/sync'
+API_CREATE_DATASET_ASYNC = API_ROOT + 'vision/datasets/upload' #not yet used
 API_TRAIN_MODEL = API_ROOT + 'vision/train'
 
 # LANGUAGE API Endpoints
@@ -144,14 +147,16 @@ class EinsteinVisionService:
         return r
 
 
-    def create_dataset_synchronous(self, file_url, token=None, url=API_CREATE_DATASET):
+    def create_dataset_synchronous(self, file_url, dataset_type='image', token=None, url=API_CREATE_DATASET):
         """ Creates a dataset so you can train models from it
             :param file_url: string, url to an accessible zip file containing the necessary image files
             and folder structure indicating the labels to train. See docs online.
+            :param dataset_type: string, one of the dataset types, available options Nov 2017 were 
+            'image', 'image-detection' and 'image-multi-label'.
             returns: requests object
         """
         auth = 'Bearer ' + self.check_for_token(token)
-        m = MultipartEncoder(fields={'type':'image', 'path':file_url})
+        m = MultipartEncoder(fields={'type':dataset_type, 'path':file_url})
         h = {'Authorization': auth, 'Cache-Control':'no-cache', 'Content-Type':m.content_type}
         the_url = url
         r = requests.post(the_url, headers=h, data=m)
@@ -162,7 +167,7 @@ class EinsteinVisionService:
     def train_model(self, dataset_id, model_name, token=None, url=API_TRAIN_MODEL):
         """ Train a model given a specifi dataset previously created
             :param dataset_id: string, the id of a previously created dataset
-            :para model_name: string, what you will call this model
+            :param model_name: string, what you will call this model
             attention: This may take a while and a response will be returned before the model has
             finished being trained. See docos and method get_training_status.
             returns: requests object
@@ -183,11 +188,32 @@ class EinsteinVisionService:
         """
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
-        the_url = url + model_id
+        the_url = url + '/' + model_id
         r = requests.get(the_url, headers=h)
 
         return r
 
+
+    def get_models_info_for_dataset(self, dataset_id, token=None, url=API_GET_MODELS):
+        """ Gets metadata on all models available for given dataset id
+            :param dataset_id: string, previously obtained dataset id
+            warning: if providing your own url here, also include the dataset_id in the right place
+            as this method will not include it for you. Otherwise use the dataset_id attribute as 
+            per usual
+            returns: a requests object
+        """
+        auth = 'Bearer ' + self.check_for_token(token)
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        if url != API_GET_MODELS:
+            r = requests.get(the_url, headers=h)
+            return r
+
+        the_url = url.replace('<dataset_id>', dataset_id)
+        r = requests.get(the_url, headers=h)
+
+        return r
+
+<<<<<<< HEAD
 
     def create_language_dataset_from_url(self, file_url, token=None, url=API_CREATE_LANGUAGE_DATASET):
         auth = 'Bearer ' + self.check_for_token(token)
@@ -229,3 +255,79 @@ class EinsteinVisionService:
         r = requests.post(the_url, headers=h, files=dummy_files)
 
         return r
+=======
+    
+    def parse_rectlabel_app_output(self):
+        """ Internal use mostly, finds all .json files in the current folder expecting them to all have been outputted by the RectLabel app
+            parses each file returning finally an array representing a csv file where each element is a row and the 1st element [0] is the
+            column headers.
+            Could be useful for subsequent string manipulation therefore not prefixed with an underscore
+            RectLabel info: https://rectlabel.com/
+        """
+        # get json files only
+        files = []
+        files = [f for f in os.listdir() if f[-5:] == '.json']
+
+        if len(files) == 0:
+            print('No json files found in this directory')
+            return None
+
+        max_boxes = 0        
+        rows = []
+
+        for each_file in files:
+            f = open(each_file, 'r')
+            j = f.read()            
+            j = json.loads(j)            
+            f.close()
+
+            # running count of the # of boxes.
+            if len(j['objects']) > max_boxes:
+                max_boxes = len(j['objects'])
+
+            # Each json file will end up being a row
+            # set labels
+            row = []
+
+            for o in j['objects']:
+                labels = {}
+                labels['label'] = o['label']
+                labels['x'] = o['x_y_w_h'][0]
+                labels['y'] = o['x_y_w_h'][1]
+                labels['width'] = o['x_y_w_h'][2]
+                labels['height'] = o['x_y_w_h'][3]
+
+                # String manipulation for csv
+                labels_right_format = '\"' + json.dumps(labels).replace('"', '\"\"') + '\"'
+
+                row.append(labels_right_format)
+
+            row.insert(0, '\"' + j['filename'] + '\"')        
+
+            rows.append(row)
+
+        # on array element per row
+        rows = [','.join(i) for i in rows]
+
+        header = '\"image\"'
+        
+        for box_num in range(0, max_boxes):
+            header += ', \"box\"' + str(box_num)
+
+        rows.insert(0, header)
+        return rows
+
+    def save_parsed_data_to_csv(self, output_filename='output.csv'):
+        """ Outputs a csv file in accordance with parse_rectlabel_app_output method. This csv file is meant to accompany a set of pictures files
+            in the creation of an Object Detection dataset.
+            :param output_filename string, default makes sense, but for your convenience.
+        """
+        result = self.parse_rectlabel_app_output()
+
+        ff = open(output_filename, 'w', encoding='utf8')
+
+        for line in result:
+            ff.write(line + '\n')
+
+        ff.close()
+>>>>>>> a2ca2b04c2a65694fecbb908977d0010d94d1d2a
