@@ -15,6 +15,10 @@ API_GET_MODELS = API_ROOT + 'vision/datasets/<dataset_id>/models'
 API_CREATE_DATASET = API_ROOT + 'datasets/upload/sync'
 API_TRAIN_MODEL = API_ROOT + 'vision/train'
 
+# LANGUAGE API Endpoints
+API_CREATE_LANGUAGE_DATASET = API_ROOT + 'language/datasets/upload'
+API_GET_LANGUAGE_DATASET_INFO = API_ROOT + 'language/datasets/'
+API_TRAIN_LANGUAGE_MODEL = API_ROOT + 'language/train'
 
 class EinsteinVisionService:
     """ A wrapper for Salesforce's Einstein Vision API.
@@ -181,5 +185,47 @@ class EinsteinVisionService:
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
         the_url = url + model_id
         r = requests.get(the_url, headers=h)
+
+        return r
+
+
+    def create_language_dataset_from_url(self, file_url, token=None, url=API_CREATE_LANGUAGE_DATASET):
+        auth = 'Bearer ' + self.check_for_token(token)
+        dummy_files = {'type': (None, 'text-intent'), 'path':(None, file_url)}
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url
+        r = requests.post(the_url, headers=h, files=dummy_files)
+
+        return r
+
+        # example grive direct download: 
+        # https://drive.google.com/uc?export=download&id=1ETMujAjIQgXVnAL-e99rTbeVjZk_4j5o
+
+    
+    def train_language_model_from_dataset(self, dataset_id, name, token=None, url=API_TRAIN_LANGUAGE_MODEL):
+        auth = 'Bearer ' + self.check_for_token(token)
+        dummy_files = {'name': (None, name), 'datasetId':(None, dataset_id)}
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url
+        r = requests.post(the_url, headers=h, files=dummy_files)
+
+        return r
+
+
+    def get_language_model_status(self, dataset_id, model_id, token=None, url=API_TRAIN_LANGUAGE_MODEL):
+        auth = 'Bearer ' + self.check_for_token(token)        
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url + model_id
+        r = requests.get(the_url, headers=h)
+
+        return r
+
+    
+    def get_language_prediction_from_model(self, model_id, document, token=None, url=):
+        auth = 'Bearer ' + self.check_for_token(token)
+        dummy_files = {'modelId': (None, model_id), 'document':(None, document)}
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+        the_url = url
+        r = requests.post(the_url, headers=h, files=dummy_files)
 
         return r
