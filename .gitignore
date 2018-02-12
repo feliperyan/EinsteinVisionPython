@@ -9,3 +9,4 @@ minimal_env
 images
 minimal
 .DS_Store
+.coverage

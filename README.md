@@ -2,7 +2,7 @@
 [![travis-ci](https://travis-ci.org/feliperyan/EinsteinVisionPython.svg?branch=master)](https://travis-ci.org/feliperyan/EinsteinVisionPython)
 # EinsteinVisionPython
 
-### Very much a work in progress Python Wrapper for the [Einstein Predictive Vision API service](https://devcenter.heroku.com/articles/einstein-vision)
+### Very much a work in progress Python Wrapper for the [Einstein Predictive Vision API service](https://metamind.readme.io/) - recently added methods to support Language Intent API.
 
 ### Installation:
 
@@ -33,4 +33,7 @@ r.json()
 6. Train a model given a dataset id
 7. Check on status of training
 8. Parse the output of [RectLabel](https://rectlabel.com/) (a json file per  picture) into a csv file to train Object Detection
+9. Create a Language Intent dataset
+10. Train a Language Intent model
+11. Get predictions on a Language Intent model
 
