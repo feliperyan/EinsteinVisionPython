@@ -12,3 +12,4 @@ minimal
 .coverage
 *.egg*
 MANIFEST
+.ipynb*

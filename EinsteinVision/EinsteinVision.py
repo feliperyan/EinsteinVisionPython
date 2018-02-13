@@ -258,7 +258,7 @@ class EinsteinVisionService:
         """
         auth = 'Bearer ' + self.check_for_token(token)        
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
-        the_url = url + model_id
+        the_url = url + '/' + model_id
         r = requests.get(the_url, headers=h)
 
         return r
@@ -338,6 +338,7 @@ class EinsteinVisionService:
 
         rows.insert(0, header)
         return rows
+
 
     def save_parsed_data_to_csv(self, output_filename='output.csv'):
         """ Outputs a csv file in accordance with parse_rectlabel_app_output method. This csv file is meant to accompany a set of pictures files
