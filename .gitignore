@@ -10,3 +10,5 @@ images
 minimal
 .DS_Store
 .coverage
+*.egg*
+MANIFEST
