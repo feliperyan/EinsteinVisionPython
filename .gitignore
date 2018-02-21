@@ -13,3 +13,4 @@ minimal
 *.egg*
 MANIFEST
 .ipynb*
+new_p_env

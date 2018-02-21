@@ -5,6 +5,7 @@ import time
 import base64
 import os
 import json
+import xml.etree.ElementTree as ET
 
 
 API_ROOT = 'https://api.einstein.ai/v2/'
@@ -328,7 +329,7 @@ class EinsteinVisionService:
 
             rows.append(row)
 
-        # on array element per row
+        # one array element per row
         rows = [','.join(i) for i in rows]
 
         header = '\"image\"'
@@ -353,3 +354,68 @@ class EinsteinVisionService:
             ff.write(line + '\n')
 
         ff.close()
+
+
+    def XML_save_parsed_data_to_csv(self, output_filename='output.csv'):
+        """ Outputs a csv file in accordance with parse_rectlabel_app_output method. This csv file is meant to accompany a set of pictures files
+            in the creation of an Object Detection dataset.
+            :param output_filename string, default makes sense, but for your convenience.
+        """
+        result = self.XML_parse_rectlabel_app_output()
+
+        ff = open(output_filename, 'w', encoding='utf8')
+
+        for line in result:
+            ff.write(line + '\n')
+
+        ff.close()
+
+    
+    def XML_parse_rectlabel_app_output(self):
+        files = []
+        files = [f for f in os.listdir() if f[-4:] == '.xml']
+
+        max_boxes = 0
+        rows = []        
+
+        for f in files:
+            tree = ET.parse(f)
+            root = tree.getroot()
+            row = []
+            objects = root.findall('object')
+            print(objects)
+
+            if len(objects) > max_boxes:
+                max_boxes = len(objects)
+
+            for o in objects:
+                labels = {}
+                labels['label'] = o.find('name').text
+                labels['x'] = int(o.find('bndbox').find('xmin').text)
+                labels['y'] = int(o.find('bndbox').find('ymin').text)
+                labels['width'] = int(o.find('bndbox').find('xmax').text) - labels['x']
+                labels['height'] = int(o.find('bndbox').find('ymax').text) - labels['y']
+                print(labels)
+                # String manipulation for csv
+                labels_right_format = '\"' + json.dumps(labels).replace('"', '\"\"') + '\"'
+
+                row.append(labels_right_format)
+
+            row.insert(0, '\"' + root.find('filename').text + '\"')        
+
+            rows.append(row)
+
+        # one array element per row
+        rows = [','.join(i) for i in rows]
+
+        header = '\"image\"'
+        
+        for box_num in range(0, max_boxes):
+            header += ', \"box\"' + str(box_num)
+
+        rows.insert(0, header)
+        return rows
+
+
+
+
