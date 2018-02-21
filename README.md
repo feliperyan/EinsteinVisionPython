@@ -36,4 +36,5 @@ r.json()
 9. Create a Language Intent dataset
 10. Train a Language Intent model
 11. Get predictions on a Language Intent model
+12. Apparently the developer behind RectLabel decided to remove the functionality to output data in JSON (?) so I have re-redeveloped the same functionality to take into the account the XML output, prefixed in XML_
 
