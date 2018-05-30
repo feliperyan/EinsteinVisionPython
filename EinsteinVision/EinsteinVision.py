@@ -29,17 +29,19 @@ class EinsteinVisionService:
     """ A wrapper for Salesforce's Einstein Vision API.
         :param token: string, in case you obtained a token somewhere else and want to use it here.
         :param email: string, the username for your Enstein Vision account, not needed if you already have a token
-        :param pem_file: string, name of a file containing your secret key, defaults to predictive_services.pem    
+        :param rsa_cert: string, most likely coming straight from the Heroku Config Vars
+        :param pem_file: string, name of a file containing your secret key, defaults to predictive_services.pem
     """
-    def __init__(self, token=None, email=None, pem_file='predictive_services.pem'):
+    def __init__(self, token=None, email=None, rsa_cert=None, pem_file='predictive_services.pem'):
         self.token = token
         self.email = email
 
         if token is None:
-            with open(pem_file, 'r') as pem:
-                pem_data = pem.read()
-
-            self.private_key = pem_data
+            if rsa_cert is None:                
+                with open(pem_file, 'r') as pem:
+                    self.private_key = pem.read()
+            else:
+                self.private_key = rsa_cert
 
 
     def get_token(self):
