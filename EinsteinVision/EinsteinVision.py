@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 API_ROOT = 'https://api.einstein.ai/v2/'
 API_GET_USAGE = API_ROOT + 'apiusage'
-API_GET_MODEL_INFO = API_ROOT + 'vision/models/'
+API_GET_MODEL_INFO = API_ROOT + 'vision/models'
 API_GET_DATASETS_INFO = API_ROOT + 'vision/datasets'
 API_GET_PREDICTION_IMAGE_URL = API_ROOT + 'vision/predict'
 API_OAUTH = API_ROOT + 'oauth2/token'
@@ -97,7 +97,7 @@ class EinsteinVisionService:
         """
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
-        the_url = url + model_id
+        the_url = url + '/' + model_id
         r = requests.get(the_url, headers=h)
 
         return r
@@ -454,7 +454,7 @@ class EinsteinVisionService:
         return r
 
 
-    def delete_model(self, dataset_id, model_id, token=None, url=API_GET_MODEL_INFO):
+    def delete_model(self, model_id, token=None, url=API_GET_MODEL_INFO):
         auth = 'Bearer ' + self.check_for_token(token)
         h = {'Authorization': auth, 'Cache-Control':'no-cache'}
 
