@@ -4,7 +4,7 @@ cffi==1.10.0
 chardet==3.0.4
 codecov==2.0.9
 coverage==4.4.1
-cryptography==2.0.3
+cryptography>=2.3
 EinsteinVision==0.5
 idna==2.6
 pycparser==2.18
