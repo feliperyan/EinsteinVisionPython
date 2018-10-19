@@ -25,6 +25,7 @@ API_GET_LANGUAGE_DATASET_INFO = API_ROOT + 'language/datasets/'
 API_TRAIN_LANGUAGE_MODEL = API_ROOT + 'language/train'
 API_GET_LANGUAGE_PREDICTION = API_ROOT + 'language/intent'
 
+
 class EinsteinVisionService:
     """ A wrapper for Salesforce's Einstein Vision API.
         :param token: string, in case you obtained a token somewhere else and want to use it here.
@@ -439,5 +440,62 @@ class EinsteinVisionService:
         return rows
 
 
+    def delete_dataset(self, dataset_id, token=None, url=API_GET_DATASETS_INFO):
+        auth = 'Bearer ' + self.check_for_token(token)
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+
+        if url != API_GET_DATASETS_INFO:
+            r = requests.get(the_url, headers=h)
+            return r        
+
+        the_url = url + '/' + str(dataset_id)
+        r = requests.delete(the_url, headers=h)
+
+        return r
 
 
+    def delete_model(self, dataset_id, model_id, token=None, url=API_GET_MODEL_INFO):
+        auth = 'Bearer ' + self.check_for_token(token)
+        h = {'Authorization': auth, 'Cache-Control':'no-cache'}
+
+        if url != API_GET_MODEL_INFO:
+            r = requests.get(the_url, headers=h)
+            return r        
+
+        the_url = url + '/' + str(model_id)
+        r = requests.delete(the_url, headers=h)
+
+        return r
+
+
+    def get_list_of_all_models(self, token=None):
+        d = self.get_datasets_info().json()['data']
+        models = []
+
+        self.get_token()
+
+        print('Found ' + str(len(d)) + ' datasets. An equal number of API calls will be made and it might take a while...')
+
+        for dataset in d:
+            mods = self.get_models_info_for_dataset(str(dataset['id'])).json()
+            for model in mods['data']:
+                models.append(model)
+        
+        return models
+
+    
+    def get_list_of_all_models(einstein, token=None):
+        print('refreshing token...')
+        einstein.get_token()
+        
+        d = einstein.get_datasets_info().json()['data']
+        models = []        
+
+        print (f'\nfound {len(d)} datasets - will need same amount of callouts...\n')
+
+        for dataset in d:
+            mods = einstein.get_models_info_for_dataset(str(dataset['id'])).json()
+            for model in mods['data']:
+                models.append(model)
+        
+        return models
