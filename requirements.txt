@@ -8,7 +8,7 @@ cryptography>=2.3
 EinsteinVision==0.5
 idna==2.6
 pycparser==2.18
-PyJWT==1.5.2
+PyJWT==2.4.0
 requests>=2.20.0
 requests-toolbelt==0.8.0
 six==1.10.0
