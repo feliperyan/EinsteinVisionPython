@@ -2,7 +2,7 @@ asn1crypto==0.22.0
 certifi==2017.7.27.1
 cffi==1.10.0
 chardet==3.0.4
-codecov==2.0.9
+codecov==2.0.16
 coverage==4.4.1
 cryptography>=2.3
 EinsteinVision==0.5
